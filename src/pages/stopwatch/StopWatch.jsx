@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import "./stopwatch.css";
 
 const StopWatch = () => {
   const [isRunning, setIsRunning] = useState(false);
