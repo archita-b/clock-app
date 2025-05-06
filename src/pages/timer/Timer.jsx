@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import "./timer.css";
 
 const Timer = () => {
   const initialTime = 5 * 60 * 1000;
@@ -59,18 +60,18 @@ const Timer = () => {
       <div className="timer-display">{formatTime(timeLeft)}</div>
       <div className="timer-control">
         {!hasStarted && (
-          <div className="start-timer" onClick={startTimer}>
+          <button className="start-timer" onClick={startTimer}>
             Start
-          </div>
+          </button>
         )}
         {hasStarted && (
           <>
-            <div className="resume-button" onClick={toggleTimer}>
+            <button className="resume-timer" onClick={toggleTimer}>
               {isTimerRunning ? "Pause" : "Resume"}
-            </div>
-            <div className="delete-timer" onClick={resetTimer}>
+            </button>
+            <button className="delete-timer" onClick={resetTimer}>
               Delete
-            </div>
+            </button>
           </>
         )}
       </div>
