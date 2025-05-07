@@ -2,9 +2,11 @@ import React, { useState, useRef, useEffect } from "react";
 import "./timer.css";
 
 const Timer = () => {
-  const initialTime = 5 * 60 * 1000;
+  const [hours, setHours] = useState("00");
+  const [minutes, setMinutes] = useState("00");
+  const [seconds, setSeconds] = useState("00");
 
-  const [timeLeft, setTimeLeft] = useState(initialTime);
+  const [timeLeft, setTimeLeft] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const intervalRef = useRef(null);
@@ -27,15 +29,25 @@ const Timer = () => {
   }, [isTimerRunning]);
 
   function startTimer() {
-    setIsTimerRunning(true);
-    setHasStarted(true);
+    const totalMs =
+      1000 *
+      (parseInt(hours) * 3600 + parseInt(minutes) * 60 + parseInt(seconds));
+
+    if (totalMs > 0) {
+      setTimeLeft(totalMs);
+      setIsTimerRunning(true);
+      setHasStarted(true);
+    }
   }
 
   function resetTimer() {
     clearInterval(intervalRef.current);
     setIsTimerRunning(false);
     setHasStarted(false);
-    setTimeLeft(initialTime);
+    setTimeLeft(0);
+    setHours("00");
+    setMinutes("00");
+    setSeconds("00");
   }
 
   function toggleTimer() {
@@ -57,7 +69,38 @@ const Timer = () => {
 
   return (
     <div className="timer">
-      <div className="timer-display">{formatTime(timeLeft)}</div>
+      {!hasStarted ? (
+        <div className="input-containers">
+          <input
+            value={hours}
+            type="number"
+            min="0"
+            placeholder="HH"
+            onChange={(e) => setHours(e.target.value)}
+          />
+          <span>:</span>
+          <input
+            value={minutes}
+            type="number"
+            min="0"
+            max="59"
+            placeholder="MM"
+            onChange={(e) => setMinutes(e.target.value)}
+          />
+          <span>:</span>
+          <input
+            value={seconds}
+            type="number"
+            min="0"
+            max="59"
+            placeholder="SS"
+            onChange={(e) => setSeconds(e.target.value)}
+          />
+        </div>
+      ) : (
+        <div className="timer-display">{formatTime(timeLeft)}</div>
+      )}
+
       <div className="timer-control">
         {!hasStarted && (
           <button className="start-timer" onClick={startTimer}>

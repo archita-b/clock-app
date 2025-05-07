@@ -1,3 +1,19 @@
+.input-containers {
+    margin-top: 10rem;
+    display: flex;
+    gap: 0.5rem;
+    font-size: 2rem;
+    color: #333b;
+}
+.input-containers input {
+    width: 3rem;
+    text-align: center;
+    font-size: 2rem;
+    background-color: white;
+    color: #333b;
+    border: 2px solid #ccc;
+    border-radius: 0.5rem;
+}
 .timer {
     display: flex;
     flex-direction: column;
