@@ -1,15 +1,21 @@
 import React, { useState, useRef, useEffect } from "react";
+import notification from "../../assets/notification.mp3";
 import "./timer.css";
 
 const Timer = () => {
+  const initialTime = 10 * 1000;
   const [hours, setHours] = useState("00");
   const [minutes, setMinutes] = useState("00");
   const [seconds, setSeconds] = useState("00");
 
+  const [defaultTime, setDefaultTime] = useState(initialTime);
   const [timeLeft, setTimeLeft] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
   const intervalRef = useRef(null);
+  const audioRef = useRef(null);
 
   useEffect(() => {
     if (isTimerRunning) {
@@ -18,15 +24,25 @@ const Timer = () => {
           if (prev <= 1000) {
             clearInterval(intervalRef.current);
             setIsTimerRunning(false);
-            return 0;
+            setIsFinished(true);
+            setTimeLeft(defaultTime);
+            setShowPopup(true);
+            audioRef.current.play();
+            return defaultTime;
           }
+
           return prev - 1000;
         });
       }, 1000);
     }
 
     return () => clearInterval(intervalRef.current);
-  }, [isTimerRunning]);
+  }, [isTimerRunning, defaultTime]);
+
+  useEffect(() => {
+    audioRef.current = new Audio(notification);
+    audioRef.current.loop = true;
+  }, []);
 
   function startTimer() {
     const totalMs =
@@ -34,6 +50,7 @@ const Timer = () => {
       (parseInt(hours) * 3600 + parseInt(minutes) * 60 + parseInt(seconds));
 
     if (totalMs > 0) {
+      setDefaultTime(totalMs);
       setTimeLeft(totalMs);
       setIsTimerRunning(true);
       setHasStarted(true);
@@ -44,6 +61,8 @@ const Timer = () => {
     clearInterval(intervalRef.current);
     setIsTimerRunning(false);
     setHasStarted(false);
+    setShowPopup(false);
+    audioRef.current.pause();
     setTimeLeft(0);
     setHours("00");
     setMinutes("00");
@@ -52,6 +71,18 @@ const Timer = () => {
 
   function toggleTimer() {
     setIsTimerRunning((prevState) => !prevState);
+  }
+
+  function restartTimer() {
+    setTimeLeft(defaultTime);
+    setIsFinished(false);
+    setIsTimerRunning(true);
+    setShowPopup(false);
+  }
+
+  function dismissPopup() {
+    setShowPopup(false);
+    audioRef.current.pause();
   }
 
   function formatTime(ms) {
@@ -68,57 +99,68 @@ const Timer = () => {
   }
 
   return (
-    <div className="timer">
-      {!hasStarted ? (
-        <div className="input-containers">
-          <input
-            value={hours}
-            type="number"
-            min="0"
-            placeholder="HH"
-            onChange={(e) => setHours(e.target.value)}
-          />
-          <span>:</span>
-          <input
-            value={minutes}
-            type="number"
-            min="0"
-            max="59"
-            placeholder="MM"
-            onChange={(e) => setMinutes(e.target.value)}
-          />
-          <span>:</span>
-          <input
-            value={seconds}
-            type="number"
-            min="0"
-            max="59"
-            placeholder="SS"
-            onChange={(e) => setSeconds(e.target.value)}
-          />
+    <>
+      {showPopup && (
+        <div className="popup">
+          <span>Time's up!</span>
+          <button onClick={dismissPopup}>Dismiss</button>
         </div>
-      ) : (
-        <div className="timer-display">{formatTime(timeLeft)}</div>
       )}
+      <div className="timer">
+        {!hasStarted ? (
+          <div className="input-containers">
+            <input
+              value={hours}
+              type="number"
+              min="0"
+              placeholder="HH"
+              onChange={(e) => setHours(e.target.value.padStart(2, "0"))}
+            />
+            <span>:</span>
+            <input
+              value={minutes}
+              type="number"
+              min="0"
+              max="59"
+              placeholder="MM"
+              onChange={(e) => setMinutes(e.target.value.padStart(2, "0"))}
+            />
+            <span>:</span>
+            <input
+              value={seconds}
+              type="number"
+              min="0"
+              max="59"
+              placeholder="SS"
+              onChange={(e) => setSeconds(e.target.value.padStart(2, "0"))}
+            />
+          </div>
+        ) : (
+          <div className="timer-display">{formatTime(timeLeft)}</div>
+        )}
 
-      <div className="timer-control">
-        {!hasStarted && (
-          <button className="start-timer" onClick={startTimer}>
-            Start
-          </button>
-        )}
-        {hasStarted && (
-          <>
-            <button className="resume-timer" onClick={toggleTimer}>
-              {isTimerRunning ? "Pause" : "Resume"}
+        <div className="timer-control">
+          {!hasStarted && (
+            <button className="start-timer" onClick={startTimer}>
+              Start
             </button>
-            <button className="delete-timer" onClick={resetTimer}>
-              Delete
-            </button>
-          </>
-        )}
+          )}
+          {hasStarted && (
+            <>
+              <button
+                className="resume-timer"
+                onClick={isFinished ? restartTimer : toggleTimer}
+              >
+                {isFinished ? "Restart" : isTimerRunning ? "Pause" : "Resume"}
+              </button>
+              <button className="delete-timer" onClick={resetTimer}>
+                Delete
+              </button>
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

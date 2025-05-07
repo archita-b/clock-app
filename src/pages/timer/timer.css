@@ -6,7 +6,7 @@
     color: #333b;
 }
 .input-containers input {
-    width: 3rem;
+    width: 3.5rem;
     text-align: center;
     font-size: 2rem;
     background-color: white;
@@ -58,6 +58,41 @@
 }
 .timer-control button:hover {
     opacity: 0.9;
+}
+.popup {
+    position: fixed;
+    top: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ddd;
+    color: #333;
+    border: 1px solid grey;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    font-weight: bold;
+    font-size: 1.5rem;
+    width: 50%;
+    max-width: 20rem;
+
+    button {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 1.1rem;
+        font-weight: bold;
+        background-color: white;
+        color: #333b;
+        box-shadow: 1px 2px 4px;
+    }
+}
+.popup button:hover {
+    color: #333f;
+    box-shadow: 2px 3px 6px;
 }
 
   
