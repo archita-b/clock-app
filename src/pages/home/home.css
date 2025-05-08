@@ -15,7 +15,7 @@
     font-size: 2rem;
     color: rgba(255,255,255,0.7);
 } 
-nav a:hover {
+.navbar a:hover {
     color: rgba(255,255,255,1);
 }
   

@@ -1,20 +1,20 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/home/Home";
-import StopWatch from "./pages/stopwatch/StopWatch";
+import Navbar from "./pages/components/Navbar";
+import Stopwatch from "./pages/stopwatch/StopWatch";
 import Timer from "./pages/timer/Timer";
 
 function App() {
   return (
-    <>
-      <BrowserRouter>
+    <BrowserRouter>
+      <div className="container">
+        <Navbar />
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/stopwatch" element={<StopWatch />} />
+          <Route path="/stopwatch" element={<Stopwatch />} />
           <Route path="/timer" element={<Timer />} />
         </Routes>
-      </BrowserRouter>
-    </>
+      </div>
+    </BrowserRouter>
   );
 }
 

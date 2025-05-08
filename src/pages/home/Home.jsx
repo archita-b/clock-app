@@ -9,6 +9,7 @@ const Home = () => {
         <Link to="/stopwatch">Stopwatch</Link>
         <Link to="/timer">Timer</Link>
       </nav>
+      <p>Clock App</p>
     </div>
   );
 };
