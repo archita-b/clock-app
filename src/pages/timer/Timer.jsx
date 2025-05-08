@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import notification from "../../assets/notification.mp3";
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
 import "./timer.css";
 
 const Timer = () => {
@@ -98,6 +100,16 @@ const Timer = () => {
     return `${hours}:${minutes}:${seconds}`;
   }
 
+  const percentage = timeLeft > 0 ? (timeLeft / defaultTime) * 100 : 0;
+
+  function getColor(percentage) {
+    if (percentage > 66) return "#4caf50";
+    if (percentage > 33) return "#ff9800";
+    return "#f44336";
+  }
+
+  const currentColor = getColor(percentage);
+
   return (
     <>
       {showPopup && (
@@ -136,7 +148,23 @@ const Timer = () => {
             />
           </div>
         ) : (
-          <div className="timer-display">{formatTime(timeLeft)}</div>
+          <div className="progress-bar">
+            {!isFinished ? (
+              <CircularProgressbar
+                value={percentage}
+                text={formatTime(timeLeft)}
+                styles={buildStyles({
+                  pathColor: currentColor,
+                  textColor: "#333",
+                  trailColor: "#eee",
+                  strokeLinecap: "round",
+                  pathTransitionDuration: 0.5,
+                })}
+              />
+            ) : (
+              <div className="timer-display">{formatTime(timeLeft)}</div>
+            )}
+          </div>
         )}
 
         <div className="timer-control">
