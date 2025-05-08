@@ -14,6 +14,11 @@
     border: 2px solid #ccc;
     border-radius: 0.5rem;
 }
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+}
 .timer {
     display: flex;
     flex-direction: column;
@@ -77,6 +82,7 @@
     font-size: 1.5rem;
     width: 50%;
     max-width: 20rem;
+    animation: slideDown 0.4s ease-out forwards;
 
     button {
         padding: 0.5rem 1rem;
@@ -87,6 +93,16 @@
         background-color: white;
         color: #333b;
         box-shadow: 1px 2px 4px;
+    }
+}
+@keyframes slideDown {
+    from {
+      transform: translateX(-50%) translateY(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(-50%) translateY(20px);
+      opacity: 1;
     }
 }
 .popup button:hover {

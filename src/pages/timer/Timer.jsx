@@ -103,8 +103,8 @@ const Timer = () => {
   const percentage = timeLeft > 0 ? (timeLeft / defaultTime) * 100 : 0;
 
   function getColor(percentage) {
-    if (percentage > 66) return "#4caf50";
-    if (percentage > 33) return "#ff9800";
+    if (percentage > 50) return "#4caf50";
+    if (percentage > 30) return "#ff9800";
     return "#f44336";
   }
 
