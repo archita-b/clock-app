@@ -178,6 +178,7 @@ const Timer = () => {
               <button
                 className="resume-timer"
                 onClick={isFinished ? restartTimer : toggleTimer}
+                disabled={isFinished && showPopup}
               >
                 {isFinished ? "Restart" : isTimerRunning ? "Pause" : "Resume"}
               </button>
