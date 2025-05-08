@@ -1,7 +1,7 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Navbar from "./pages/components/Navbar";
-import Stopwatch from "./pages/stopwatch/StopWatch";
+import Navbar from "./components/navbar/Navbar";
+import Stopwatch from "./components/stopwatch/StopWatch";
 import Timer from "./pages/timer/Timer";
 
 function App() {
@@ -10,7 +10,7 @@ function App() {
       <div className="container">
         <Navbar />
         <Routes>
-          <Route path="/stopwatch" element={<Stopwatch />} />
+          <Route path="/" element={<Stopwatch />} />
           <Route path="/timer" element={<Timer />} />
         </Routes>
       </div>
