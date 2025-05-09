@@ -1,7 +1,7 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/navbar/Navbar";
-import Stopwatch from "./components/stopwatch/StopWatch";
+import Stopwatch from "./pages/stopwatch/StopWatch";
 import Timer from "./pages/timer/Timer";
 
 function App() {
