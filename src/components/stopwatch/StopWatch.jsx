@@ -48,15 +48,15 @@ const StopWatch = () => {
 
   return (
     <div className="stopwatch">
-      <div className="display">{formatTime()}</div>
-      <div className="control-buttons">
-        <button className="start-button" onClick={start}>
+      <div className="stopwatch-display">{formatTime()}</div>
+      <div className="stopwatch-control-buttons">
+        <button className="stopwatch-start-button" onClick={start}>
           Start
         </button>
-        <button className="stop-button" onClick={stop}>
+        <button className="stopwatch-stop-button" onClick={stop}>
           Stop
         </button>
-        <button className="reset-button" onClick={reset}>
+        <button className="stopwatch-reset-button" onClick={reset}>
           Reset
         </button>
       </div>
