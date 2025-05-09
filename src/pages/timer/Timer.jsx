@@ -1,7 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
-import notification from "../../assets/notification.mp3";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+
+import notification from "../../assets/notification.mp3";
+import Popup from "../../components/popup/Popup";
+import TimerInput from "../../components/timerInput/TimerInput";
 import "./timer.css";
 
 const Timer = () => {
@@ -112,41 +115,18 @@ const Timer = () => {
 
   return (
     <>
-      {showPopup && (
-        <div className="popup">
-          <span>Time's up!</span>
-          <button onClick={dismissPopup}>Dismiss</button>
-        </div>
-      )}
+      {showPopup && <Popup dismissPopup={dismissPopup} />}
+
       <div className="timer">
         {!hasStarted ? (
-          <div className="input-containers">
-            <input
-              value={hours}
-              type="number"
-              min="0"
-              placeholder="HH"
-              onChange={(e) => setHours(e.target.value.padStart(2, "0"))}
-            />
-            <span>:</span>
-            <input
-              value={minutes}
-              type="number"
-              min="0"
-              max="59"
-              placeholder="MM"
-              onChange={(e) => setMinutes(e.target.value.padStart(2, "0"))}
-            />
-            <span>:</span>
-            <input
-              value={seconds}
-              type="number"
-              min="0"
-              max="59"
-              placeholder="SS"
-              onChange={(e) => setSeconds(e.target.value.padStart(2, "0"))}
-            />
-          </div>
+          <TimerInput
+            hours={hours}
+            setHours={setHours}
+            minutes={minutes}
+            setMinutes={setMinutes}
+            seconds={seconds}
+            setSeconds={setSeconds}
+          />
         ) : (
           <div className="progress-bar">
             {!isFinished ? (
@@ -173,6 +153,7 @@ const Timer = () => {
               Start
             </button>
           )}
+
           {hasStarted && (
             <>
               <button
