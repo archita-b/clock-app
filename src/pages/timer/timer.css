@@ -40,7 +40,7 @@
     background-color: #2196f388;
     cursor: not-allowed;
 }
-.delete-timer {
+.reset-timer {
     background-color: #dc3545;
 }
 .timer-control button:hover {

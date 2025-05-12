@@ -5,20 +5,27 @@ import "react-circular-progressbar/dist/styles.css";
 import notification from "../../assets/notification.mp3";
 import Popup from "../../components/popup/Popup";
 import TimerInput from "../../components/timerInput/TimerInput";
+import TimerStart from "../../components/timerStart/TimerStart";
+import TimerReset from "../../components/timerReset/TimerReset";
+import { formatTime } from "../../utils/FormatTime";
 import "./timer.css";
 
-const Timer = () => {
-  const initialTime = 10 * 1000;
-  const [hours, setHours] = useState("00");
-  const [minutes, setMinutes] = useState("00");
-  const [seconds, setSeconds] = useState("00");
+const milliSecondsInSeconds = 1000;
+const defaultTime = 10 * milliSecondsInSeconds;
 
-  const [defaultTime, setDefaultTime] = useState(initialTime);
+const Timer = () => {
+  const [inputTime, setInputTime] = useState({
+    hours: "",
+    minutes: "",
+    seconds: "",
+  });
+  const [initialTime, setInitialTime] = useState(defaultTime);
   const [timeLeft, setTimeLeft] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
+
   const intervalRef = useRef(null);
   const audioRef = useRef(null);
 
@@ -30,10 +37,10 @@ const Timer = () => {
             clearInterval(intervalRef.current);
             setIsTimerRunning(false);
             setIsFinished(true);
-            setTimeLeft(defaultTime);
+            setTimeLeft(initialTime);
             setShowPopup(true);
             audioRef.current.play();
-            return defaultTime;
+            return initialTime;
           }
 
           return prev - 1000;
@@ -42,7 +49,7 @@ const Timer = () => {
     }
 
     return () => clearInterval(intervalRef.current);
-  }, [isTimerRunning, defaultTime]);
+  }, [isTimerRunning, initialTime]);
 
   useEffect(() => {
     audioRef.current = new Audio(notification);
@@ -52,10 +59,12 @@ const Timer = () => {
   function startTimer() {
     const totalMs =
       1000 *
-      (parseInt(hours) * 3600 + parseInt(minutes) * 60 + parseInt(seconds));
+      (parseInt(inputTime.hours || "0") * 3600 +
+        parseInt(inputTime.minutes || "0") * 60 +
+        parseInt(inputTime.seconds || "0"));
 
     if (totalMs > 0) {
-      setDefaultTime(totalMs);
+      setInitialTime(totalMs);
       setTimeLeft(totalMs);
       setIsTimerRunning(true);
       setHasStarted(true);
@@ -69,9 +78,7 @@ const Timer = () => {
     setShowPopup(false);
     audioRef.current.pause();
     setTimeLeft(0);
-    setHours("00");
-    setMinutes("00");
-    setSeconds("00");
+    setInputTime({ hours: "", minutes: "", seconds: "" });
   }
 
   function toggleTimer() {
@@ -79,7 +86,7 @@ const Timer = () => {
   }
 
   function restartTimer() {
-    setTimeLeft(defaultTime);
+    setTimeLeft(initialTime);
     setIsFinished(false);
     setIsTimerRunning(true);
     setShowPopup(false);
@@ -90,20 +97,7 @@ const Timer = () => {
     audioRef.current.pause();
   }
 
-  function formatTime(ms) {
-    const totalSeconds = Math.floor(ms / 1000);
-    let hours = Math.floor(totalSeconds / 3600);
-    let minutes = Math.floor((totalSeconds % 3600) / 60);
-    let seconds = Math.floor(totalSeconds % 60);
-
-    hours = String(hours).padStart(2, "0");
-    minutes = String(minutes).padStart(2, "0");
-    seconds = String(seconds).padStart(2, "0");
-
-    return `${hours}:${minutes}:${seconds}`;
-  }
-
-  const percentage = timeLeft > 0 ? (timeLeft / defaultTime) * 100 : 0;
+  const percentage = timeLeft > 0 ? (timeLeft / initialTime) * 100 : 0;
 
   function getColor(percentage) {
     if (percentage > 50) return "#4caf50";
@@ -111,22 +105,13 @@ const Timer = () => {
     return "#f44336";
   }
 
-  const currentColor = getColor(percentage);
-
   return (
     <>
       {showPopup && <Popup dismissPopup={dismissPopup} />}
 
       <div className="timer">
         {!hasStarted ? (
-          <TimerInput
-            hours={hours}
-            setHours={setHours}
-            minutes={minutes}
-            setMinutes={setMinutes}
-            seconds={seconds}
-            setSeconds={setSeconds}
-          />
+          <TimerInput inputTime={inputTime} setInputTime={setInputTime} />
         ) : (
           <div className="progress-bar">
             {!isFinished ? (
@@ -134,7 +119,7 @@ const Timer = () => {
                 value={percentage}
                 text={formatTime(timeLeft)}
                 styles={buildStyles({
-                  pathColor: currentColor,
+                  pathColor: getColor(percentage),
                   textColor: "#333",
                   trailColor: "#eee",
                   strokeLinecap: "round",
@@ -142,17 +127,13 @@ const Timer = () => {
                 })}
               />
             ) : (
-              <div className="timer-display">{formatTime(timeLeft)}</div>
+              <div className="timer-display">{formatTime(timeLeft, false)}</div>
             )}
           </div>
         )}
 
         <div className="timer-control">
-          {!hasStarted && (
-            <button className="start-timer" onClick={startTimer}>
-              Start
-            </button>
-          )}
+          {!hasStarted && <TimerStart startTimer={startTimer} />}
 
           {hasStarted && (
             <>
@@ -163,9 +144,7 @@ const Timer = () => {
               >
                 {isFinished ? "Restart" : isTimerRunning ? "Pause" : "Resume"}
               </button>
-              <button className="delete-timer" onClick={resetTimer}>
-                Delete
-              </button>
+              <TimerReset resetTimer={resetTimer} />
             </>
           )}
         </div>

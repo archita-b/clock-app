@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { formatTime } from "../../utils/FormatTime";
 import "./stopwatch.css";
 
 const StopWatch = () => {
@@ -33,22 +34,9 @@ const StopWatch = () => {
     setIsRunning(false);
   }
 
-  function formatTime() {
-    const totalSeconds = Math.floor(elapsedTime / 1000);
-    let hours = Math.floor(totalSeconds / 3600);
-    let minutes = Math.floor((totalSeconds % 3600) / 60);
-    let seconds = Math.floor(totalSeconds % 60);
-
-    hours = String(hours).padStart(2, "0");
-    minutes = String(minutes).padStart(2, "0");
-    seconds = String(seconds).padStart(2, "0");
-
-    return `${hours}:${minutes}:${seconds}`;
-  }
-
   return (
     <div className="stopwatch">
-      <div className="stopwatch-display">{formatTime()}</div>
+      <div className="stopwatch-display">{formatTime(elapsedTime, true)}</div>
       <div className="stopwatch-control-buttons">
         <button className="stopwatch-start-button" onClick={start}>
           Start
