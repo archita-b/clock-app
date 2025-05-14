@@ -2,11 +2,13 @@ import React, { useState, useEffect, useRef, useReducer } from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
-import notification from "../../assets/notification.mp3";
-import Popup from "../../components/popup/Popup";
 import TimerInput from "../../components/timerInput/TimerInput";
-import TimerStart from "../../components/timerStart/TimerStart";
-import TimerReset from "../../components/timerReset/TimerReset";
+import TimerStartButton from "../../components/timerStartButton/TimerStartButton";
+import TimerResetButton from "../../components/timerResetButton/TimerResetButton";
+import TimerDismissButton from "../../components/timerDismissButton/TimerDismissButton";
+import TimerRestartButton from "../../components/timerRestartButton/TimerRestartButton";
+import Popup from "../../components/popup/Popup";
+import notification from "../../assets/notification.mp3";
 import { formatTime } from "../../utils/FormatTime";
 import "./timer.css";
 
@@ -122,6 +124,7 @@ const Timer = () => {
   function restartTimer() {
     dispatch({ type: "RESTART", payload: { time: initialTimeRef.current } });
     setShowPopup(false);
+    audioRef.current.pause();
   }
 
   function resetTimer() {
@@ -148,7 +151,9 @@ const Timer = () => {
 
   return (
     <>
-      {showPopup && <Popup dismissPopup={dismissPopup} />}
+      {showPopup && (
+        <Popup dismissPopup={dismissPopup} restartTimer={restartTimer} />
+      )}
 
       <div className="timer">
         {!state.hasStarted ? (
@@ -176,22 +181,23 @@ const Timer = () => {
         )}
 
         <div className="timer-control">
-          {!state.hasStarted && <TimerStart startTimer={startTimer} />}
+          {!state.hasStarted && <TimerStartButton startTimer={startTimer} />}
 
           {state.hasStarted && (
             <>
-              <button
-                className="resume-timer"
-                onClick={state.isFinished ? restartTimer : toggleTimer}
-                disabled={state.isFinished && showPopup}
-              >
-                {state.isFinished
-                  ? "Restart"
-                  : state.isTimerRunning
-                  ? "Pause"
-                  : "Resume"}
-              </button>
-              <TimerReset resetTimer={resetTimer} />
+              {state.isFinished ? (
+                <TimerRestartButton restartTimer={restartTimer} />
+              ) : (
+                <button className="resume-timer" onClick={toggleTimer}>
+                  {state.isTimerRunning ? "Pause" : "Resume"}
+                </button>
+              )}
+
+              {showPopup ? (
+                <TimerDismissButton dismissPopup={dismissPopup} />
+              ) : (
+                <TimerResetButton resetTimer={resetTimer} />
+              )}
             </>
           )}
         </div>

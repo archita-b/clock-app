@@ -1,6 +1,6 @@
 import React from "react";
 
-const TimerReset = ({ resetTimer }) => {
+const TimerResetButton = ({ resetTimer }) => {
   return (
     <button className="reset-timer" onClick={resetTimer}>
       Reset
@@ -8,4 +8,4 @@ const TimerReset = ({ resetTimer }) => {
   );
 };
 
-export default TimerReset;
+export default TimerResetButton;

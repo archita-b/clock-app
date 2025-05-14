@@ -30,15 +30,8 @@
     font-weight: bold;
     cursor: pointer;
 }
-.start-timer {
-    background-color: #28a745;
-}
 .resume-timer {
     background-color: #2196f3;
-}
-.resume-timer:disabled {
-    background-color: #2196f388;
-    cursor: not-allowed;
 }
 .reset-timer {
     background-color: #dc3545;

@@ -1,6 +1,7 @@
 import React from "react";
+import "./timerStartButton.css";
 
-const TimerStart = ({ startTimer }) => {
+const TimerStartButton = ({ startTimer }) => {
   return (
     <button className="start-timer" onClick={startTimer}>
       Start
@@ -8,4 +9,4 @@ const TimerStart = ({ startTimer }) => {
   );
 };
 
-export default TimerStart;
+export default TimerStartButton;
