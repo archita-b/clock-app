@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef, useReducer } from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
@@ -10,46 +10,98 @@ import TimerReset from "../../components/timerReset/TimerReset";
 import { formatTime } from "../../utils/FormatTime";
 import "./timer.css";
 
-const milliSecondsInSeconds = 1000;
-const defaultTime = 10 * milliSecondsInSeconds;
+function reducer(state, action) {
+  switch (action.type) {
+    case "START":
+      return {
+        ...state,
+        timeLeft: action.payload.time,
+        isTimerRunning: true,
+        hasStarted: true,
+        isFinished: false,
+      };
+
+    case "TICK":
+      return {
+        ...state,
+        timeLeft: state.timeLeft - 1000,
+      };
+
+    case "PAUSE-RESUME":
+      return { ...state, isTimerRunning: !state.isTimerRunning };
+
+    case "FINISH":
+      return {
+        ...state,
+        timeLeft: action.payload.lastInput,
+        isTimerRunning: false,
+        isFinished: true,
+      };
+
+    case "RESTART":
+      return {
+        ...state,
+        timeLeft: action.payload.time,
+        isTimerRunning: true,
+        isFinished: false,
+      };
+
+    case "RESET":
+      return { ...initialState };
+
+    default:
+      return state;
+  }
+}
+
+const initialState = {
+  timeLeft: 0,
+  isTimerRunning: false,
+  hasStarted: false,
+  isFinished: false,
+};
 
 const Timer = () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
   const [inputTime, setInputTime] = useState({
     hours: "",
     minutes: "",
     seconds: "",
   });
-  const [initialTime, setInitialTime] = useState(defaultTime);
-  const [timeLeft, setTimeLeft] = useState(0);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [hasStarted, setHasStarted] = useState(false);
-  const [isFinished, setIsFinished] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
 
+  const initialTimeRef = useRef(0);
   const intervalRef = useRef(null);
   const audioRef = useRef(null);
 
-  useEffect(() => {
-    if (isTimerRunning) {
-      intervalRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1000) {
-            clearInterval(intervalRef.current);
-            setIsTimerRunning(false);
-            setIsFinished(true);
-            setTimeLeft(initialTime);
-            setShowPopup(true);
-            audioRef.current.play();
-            return initialTime;
-          }
+  const inputTimeInMilliseconds =
+    1000 *
+    (parseInt(inputTime.hours || "0") * 3600 +
+      parseInt(inputTime.minutes || "0") * 60 +
+      parseInt(inputTime.seconds || "0"));
 
-          return prev - 1000;
-        });
+  useEffect(() => {
+    if (state.isTimerRunning) {
+      intervalRef.current = setInterval(() => {
+        dispatch({ type: "TICK" });
       }, 1000);
     }
 
     return () => clearInterval(intervalRef.current);
-  }, [isTimerRunning, initialTime]);
+  }, [state.isTimerRunning]);
+
+  useEffect(() => {
+    if (state.timeLeft <= 0 && state.isTimerRunning) {
+      clearInterval(intervalRef.current);
+      dispatch({
+        type: "FINISH",
+        payload: { lastInput: inputTimeInMilliseconds },
+      });
+      setShowPopup(true);
+      audioRef.current.play();
+    }
+  }, [state.timeLeft, state.isTimerRunning]);
 
   useEffect(() => {
     audioRef.current = new Audio(notification);
@@ -57,38 +109,26 @@ const Timer = () => {
   }, []);
 
   function startTimer() {
-    const totalMs =
-      1000 *
-      (parseInt(inputTime.hours || "0") * 3600 +
-        parseInt(inputTime.minutes || "0") * 60 +
-        parseInt(inputTime.seconds || "0"));
-
-    if (totalMs > 0) {
-      setInitialTime(totalMs);
-      setTimeLeft(totalMs);
-      setIsTimerRunning(true);
-      setHasStarted(true);
+    if (inputTimeInMilliseconds > 0) {
+      initialTimeRef.current = inputTimeInMilliseconds;
+      dispatch({ type: "START", payload: { time: inputTimeInMilliseconds } });
     }
+  }
+
+  function toggleTimer() {
+    dispatch({ type: "PAUSE-RESUME" });
+  }
+
+  function restartTimer() {
+    dispatch({ type: "RESTART", payload: { time: initialTimeRef.current } });
+    setShowPopup(false);
   }
 
   function resetTimer() {
     clearInterval(intervalRef.current);
-    setIsTimerRunning(false);
-    setHasStarted(false);
-    setShowPopup(false);
     audioRef.current.pause();
-    setTimeLeft(0);
+    dispatch({ type: "RESET" });
     setInputTime({ hours: "", minutes: "", seconds: "" });
-  }
-
-  function toggleTimer() {
-    setIsTimerRunning((prevState) => !prevState);
-  }
-
-  function restartTimer() {
-    setTimeLeft(initialTime);
-    setIsFinished(false);
-    setIsTimerRunning(true);
     setShowPopup(false);
   }
 
@@ -97,7 +137,8 @@ const Timer = () => {
     audioRef.current.pause();
   }
 
-  const percentage = timeLeft > 0 ? (timeLeft / initialTime) * 100 : 0;
+  const percentage =
+    state.timeLeft > 0 ? (state.timeLeft / initialTimeRef.current) * 100 : 0;
 
   function getColor(percentage) {
     if (percentage > 50) return "#4caf50";
@@ -110,14 +151,14 @@ const Timer = () => {
       {showPopup && <Popup dismissPopup={dismissPopup} />}
 
       <div className="timer">
-        {!hasStarted ? (
+        {!state.hasStarted ? (
           <TimerInput inputTime={inputTime} setInputTime={setInputTime} />
         ) : (
           <div className="progress-bar">
-            {!isFinished ? (
+            {!state.isFinished ? (
               <CircularProgressbar
                 value={percentage}
-                text={formatTime(timeLeft)}
+                text={formatTime(state.timeLeft)}
                 styles={buildStyles({
                   pathColor: getColor(percentage),
                   textColor: "#333",
@@ -127,22 +168,28 @@ const Timer = () => {
                 })}
               />
             ) : (
-              <div className="timer-display">{formatTime(timeLeft, false)}</div>
+              <div className="timer-display">
+                {formatTime(state.timeLeft, false)}
+              </div>
             )}
           </div>
         )}
 
         <div className="timer-control">
-          {!hasStarted && <TimerStart startTimer={startTimer} />}
+          {!state.hasStarted && <TimerStart startTimer={startTimer} />}
 
-          {hasStarted && (
+          {state.hasStarted && (
             <>
               <button
                 className="resume-timer"
-                onClick={isFinished ? restartTimer : toggleTimer}
-                disabled={isFinished && showPopup}
+                onClick={state.isFinished ? restartTimer : toggleTimer}
+                disabled={state.isFinished && showPopup}
               >
-                {isFinished ? "Restart" : isTimerRunning ? "Pause" : "Resume"}
+                {state.isFinished
+                  ? "Restart"
+                  : state.isTimerRunning
+                  ? "Pause"
+                  : "Resume"}
               </button>
               <TimerReset resetTimer={resetTimer} />
             </>
