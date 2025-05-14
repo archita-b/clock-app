@@ -12,6 +12,13 @@ import notification from "../../assets/notification.mp3";
 import { formatTime } from "../../utils/FormatTime";
 import "./timer.css";
 
+const initialState = {
+  timeLeft: 0,
+  isTimerRunning: false,
+  hasStarted: false,
+  isFinished: false,
+};
+
 function reducer(state, action) {
   switch (action.type) {
     case "START":
@@ -24,21 +31,24 @@ function reducer(state, action) {
       };
 
     case "TICK":
-      return {
-        ...state,
-        timeLeft: state.timeLeft - 1000,
-      };
+      if (state.timeLeft - 1000 <= 0) {
+        return {
+          ...state,
+          timeLeft: 0,
+          isTimerRunning: false,
+          isFinished: true,
+        };
+      }
+      if (state.timeLeft > 0 && state.isTimerRunning) {
+        return {
+          ...state,
+          timeLeft: state.timeLeft - 1000,
+        };
+      }
+      break;
 
     case "PAUSE-RESUME":
       return { ...state, isTimerRunning: !state.isTimerRunning };
-
-    case "FINISH":
-      return {
-        ...state,
-        timeLeft: action.payload.lastInput,
-        isTimerRunning: false,
-        isFinished: true,
-      };
 
     case "RESTART":
       return {
@@ -56,16 +66,7 @@ function reducer(state, action) {
   }
 }
 
-const initialState = {
-  timeLeft: 0,
-  isTimerRunning: false,
-  hasStarted: false,
-  isFinished: false,
-};
-
 const Timer = () => {
-  const [state, dispatch] = useReducer(reducer, initialState);
-
   const [inputTime, setInputTime] = useState({
     hours: "",
     minutes: "",
@@ -76,6 +77,8 @@ const Timer = () => {
   const initialTimeRef = useRef(0);
   const intervalRef = useRef(null);
   const audioRef = useRef(null);
+
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const inputTimeInMilliseconds =
     1000 *
@@ -89,21 +92,15 @@ const Timer = () => {
         dispatch({ type: "TICK" });
       }, 1000);
     }
-
     return () => clearInterval(intervalRef.current);
   }, [state.isTimerRunning]);
 
   useEffect(() => {
-    if (state.timeLeft <= 0 && state.isTimerRunning) {
-      clearInterval(intervalRef.current);
-      dispatch({
-        type: "FINISH",
-        payload: { lastInput: inputTimeInMilliseconds },
-      });
+    if (state.isFinished) {
       setShowPopup(true);
-      audioRef.current.play();
+      audioRef.current?.play();
     }
-  }, [state.timeLeft, state.isTimerRunning]);
+  }, [state.isFinished]);
 
   useEffect(() => {
     audioRef.current = new Audio(notification);
@@ -122,9 +119,9 @@ const Timer = () => {
   }
 
   function restartTimer() {
-    dispatch({ type: "RESTART", payload: { time: initialTimeRef.current } });
     setShowPopup(false);
     audioRef.current.pause();
+    dispatch({ type: "RESTART", payload: { time: initialTimeRef.current } });
   }
 
   function resetTimer() {
