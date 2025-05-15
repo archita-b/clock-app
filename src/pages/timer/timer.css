@@ -40,9 +40,12 @@
     opacity: 0.9;
 }
 .progress-bar {
-    margin-top: 15rem;
-    width: 200px;
-    height: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    margin-top: 5rem;
+    width: 250px;
+    height: 300px;
 }
 
   

@@ -8,6 +8,7 @@ import TimerResetButton from "../../components/timerResetButton/TimerResetButton
 import TimerDismissButton from "../../components/timerDismissButton/TimerDismissButton";
 import TimerRestartButton from "../../components/timerRestartButton/TimerRestartButton";
 import Popup from "../../components/popup/Popup";
+import AddNewTimer from "../../components/addNewTimer/AddNewTimer";
 import notification from "../../assets/notification.mp3";
 import { formatTime } from "../../utils/FormatTime";
 import "./timer.css";
@@ -158,17 +159,20 @@ const Timer = () => {
         ) : (
           <div className="progress-bar">
             {!state.isFinished ? (
-              <CircularProgressbar
-                value={percentage}
-                text={formatTime(state.timeLeft)}
-                styles={buildStyles({
-                  pathColor: getColor(percentage),
-                  textColor: "#333",
-                  trailColor: "#eee",
-                  strokeLinecap: "round",
-                  pathTransitionDuration: 0.5,
-                })}
-              />
+              <>
+                <AddNewTimer />
+                <CircularProgressbar
+                  value={percentage}
+                  text={formatTime(state.timeLeft)}
+                  styles={buildStyles({
+                    pathColor: getColor(percentage),
+                    textColor: "#333",
+                    trailColor: "#eee",
+                    strokeLinecap: "round",
+                    pathTransitionDuration: 0.5,
+                  })}
+                />
+              </>
             ) : (
               <div className="timer-display">
                 {formatTime(state.timeLeft, false)}

@@ -1,0 +1,15 @@
+.add-timer {
+    display: flex;
+    justify-content: flex-end;
+}
+.add-timer button {
+    font-size: 1.7rem;
+    font-weight: bold;
+    border: none;
+    background-color: transparent;
+    color: #333;
+    padding: 0.5rem;
+}
+.add-timer button:hover {
+    background-color: #eee;
+}
