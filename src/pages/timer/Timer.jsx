@@ -8,59 +8,73 @@ import TimerResetButton from "../../components/timerResetButton/TimerResetButton
 import TimerDismissButton from "../../components/timerDismissButton/TimerDismissButton";
 import TimerRestartButton from "../../components/timerRestartButton/TimerRestartButton";
 import Popup from "../../components/popup/Popup";
-import AddNewTimer from "../../components/addNewTimer/AddNewTimer";
 import notification from "../../assets/notification.mp3";
 import { formatTime } from "../../utils/FormatTime";
 import "./timer.css";
 
 const initialState = {
+  state: "IDLE",
   timeLeft: 0,
-  isTimerRunning: false,
-  hasStarted: false,
-  isFinished: false,
 };
 
 function reducer(state, action) {
-  switch (action.type) {
-    case "START":
-      return {
-        ...state,
-        timeLeft: action.payload.time,
-        isTimerRunning: true,
-        hasStarted: true,
-        isFinished: false,
-      };
-
-    case "TICK":
-      if (state.timeLeft - 1000 <= 0) {
+  switch (state.state) {
+    case "IDLE":
+      if (action.type === "START") {
         return {
-          ...state,
-          timeLeft: 0,
-          isTimerRunning: false,
-          isFinished: true,
+          state: "RUNNING",
+          timeLeft: action.payload.time,
         };
       }
-      if (state.timeLeft > 0 && state.isTimerRunning) {
+      break;
+
+    case "RUNNING":
+      if (action.type === "TICK") {
+        if (state.timeLeft <= 1000) {
+          return {
+            state: "FINISHED",
+            timeLeft: action.payload.lastInput,
+          };
+        }
         return {
           ...state,
           timeLeft: state.timeLeft - 1000,
         };
       }
+      if (action.type === "PAUSED") {
+        return {
+          ...state,
+          state: "PAUSED",
+        };
+      }
+      if (action.type === "RESET") {
+        return initialState;
+      }
       break;
 
-    case "PAUSE-RESUME":
-      return { ...state, isTimerRunning: !state.isTimerRunning };
+    case "PAUSED":
+      if (action.type === "RESUME") {
+        return {
+          ...state,
+          state: "RUNNING",
+        };
+      }
+      if (action.type === "RESET") {
+        return initialState;
+      }
+      break;
 
-    case "RESTART":
-      return {
-        ...state,
-        timeLeft: action.payload.time,
-        isTimerRunning: true,
-        isFinished: false,
-      };
-
-    case "RESET":
-      return { ...initialState };
+    case "FINISHED":
+      if (action.type === "RESTART") {
+        return {
+          state: "RUNNING",
+          timeLeft: action.payload.time,
+        };
+      }
+      if (action.type === "RESET") {
+        return initialState;
+      }
+      break;
 
     default:
       return state;
@@ -79,7 +93,7 @@ const Timer = () => {
   const intervalRef = useRef(null);
   const audioRef = useRef(null);
 
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [stateMachine, dispatch] = useReducer(reducer, initialState);
 
   const inputTimeInMilliseconds =
     1000 *
@@ -88,20 +102,23 @@ const Timer = () => {
       parseInt(inputTime.seconds || "0"));
 
   useEffect(() => {
-    if (state.isTimerRunning) {
+    if (stateMachine.state === "RUNNING") {
       intervalRef.current = setInterval(() => {
-        dispatch({ type: "TICK" });
+        dispatch({
+          type: "TICK",
+          payload: { lastInput: inputTimeInMilliseconds },
+        });
       }, 1000);
     }
     return () => clearInterval(intervalRef.current);
-  }, [state.isTimerRunning]);
+  }, [stateMachine.state]);
 
   useEffect(() => {
-    if (state.isFinished) {
+    if (stateMachine.state === "FINISHED") {
       setShowPopup(true);
       audioRef.current?.play();
     }
-  }, [state.isFinished]);
+  }, [stateMachine.state]);
 
   useEffect(() => {
     audioRef.current = new Audio(notification);
@@ -116,7 +133,11 @@ const Timer = () => {
   }
 
   function toggleTimer() {
-    dispatch({ type: "PAUSE-RESUME" });
+    if (stateMachine.state === "PAUSED") {
+      dispatch({ type: "RESUME" });
+    } else if (stateMachine.state === "RUNNING") {
+      dispatch({ type: "PAUSED" });
+    }
   }
 
   function restartTimer() {
@@ -139,7 +160,9 @@ const Timer = () => {
   }
 
   const percentage =
-    state.timeLeft > 0 ? (state.timeLeft / initialTimeRef.current) * 100 : 0;
+    stateMachine.timeLeft > 0
+      ? (stateMachine.timeLeft / initialTimeRef.current) * 100
+      : 0;
 
   function getColor(percentage) {
     if (percentage > 50) return "#4caf50";
@@ -154,43 +177,42 @@ const Timer = () => {
       )}
 
       <div className="timer">
-        {!state.hasStarted ? (
+        {stateMachine.state === "IDLE" ? (
           <TimerInput inputTime={inputTime} setInputTime={setInputTime} />
         ) : (
           <div className="progress-bar">
-            {!state.isFinished ? (
-              <>
-                <AddNewTimer />
-                <CircularProgressbar
-                  value={percentage}
-                  text={formatTime(state.timeLeft)}
-                  styles={buildStyles({
-                    pathColor: getColor(percentage),
-                    textColor: "#333",
-                    trailColor: "#eee",
-                    strokeLinecap: "round",
-                    pathTransitionDuration: 0.5,
-                  })}
-                />
-              </>
+            {stateMachine.state !== "FINISHED" ? (
+              <CircularProgressbar
+                value={percentage}
+                text={formatTime(stateMachine.timeLeft)}
+                styles={buildStyles({
+                  pathColor: getColor(percentage),
+                  textColor: "#333",
+                  trailColor: "#eee",
+                  strokeLinecap: "round",
+                  pathTransitionDuration: 0.5,
+                })}
+              />
             ) : (
               <div className="timer-display">
-                {formatTime(state.timeLeft, false)}
+                {formatTime(stateMachine.timeLeft, false)}
               </div>
             )}
           </div>
         )}
 
         <div className="timer-control">
-          {!state.hasStarted && <TimerStartButton startTimer={startTimer} />}
+          {stateMachine.state === "IDLE" && (
+            <TimerStartButton startTimer={startTimer} />
+          )}
 
-          {state.hasStarted && (
+          {["RUNNING", "PAUSED", "FINISHED"].includes(stateMachine.state) && (
             <>
-              {state.isFinished ? (
+              {stateMachine.state === "FINISHED" ? (
                 <TimerRestartButton restartTimer={restartTimer} />
               ) : (
                 <button className="resume-timer" onClick={toggleTimer}>
-                  {state.isTimerRunning ? "Pause" : "Resume"}
+                  {stateMachine.state === "RUNNING" ? "Pause" : "Resume"}
                 </button>
               )}
 
