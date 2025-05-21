@@ -81,25 +81,11 @@ function reducer(state, action) {
   }
 }
 
-const Timer = () => {
-  const [inputTime, setInputTime] = useState({
-    hours: "",
-    minutes: "",
-    seconds: "",
-  });
-  const [showPopup, setShowPopup] = useState(false);
-
+function useTimer({ inputTimeInMilliseconds, onRestart, onFinished, onReset }) {
   const initialTimeRef = useRef(0);
   const intervalRef = useRef(null);
-  const audioRef = useRef(null);
 
   const [stateMachine, dispatch] = useReducer(reducer, initialState);
-
-  const inputTimeInMilliseconds =
-    1000 *
-    (parseInt(inputTime.hours || "0") * 3600 +
-      parseInt(inputTime.minutes || "0") * 60 +
-      parseInt(inputTime.seconds || "0"));
 
   useEffect(() => {
     if (stateMachine.state === "RUNNING") {
@@ -115,15 +101,9 @@ const Timer = () => {
 
   useEffect(() => {
     if (stateMachine.state === "FINISHED") {
-      setShowPopup(true);
-      audioRef.current?.play();
+      onFinished();
     }
   }, [stateMachine.state]);
-
-  useEffect(() => {
-    audioRef.current = new Audio(notification);
-    audioRef.current.loop = true;
-  }, []);
 
   function startTimer() {
     if (inputTimeInMilliseconds > 0) {
@@ -141,28 +121,82 @@ const Timer = () => {
   }
 
   function restartTimer() {
-    setShowPopup(false);
-    audioRef.current.pause();
+    onRestart();
     dispatch({ type: "RESTART", payload: { time: initialTimeRef.current } });
   }
 
   function resetTimer() {
+    onReset();
     clearInterval(intervalRef.current);
-    audioRef.current.pause();
     dispatch({ type: "RESET" });
-    setInputTime({ hours: "", minutes: "", seconds: "" });
-    setShowPopup(false);
-  }
-
-  function dismissPopup() {
-    setShowPopup(false);
-    audioRef.current.pause();
   }
 
   const percentage =
     stateMachine.timeLeft > 0
       ? (stateMachine.timeLeft / initialTimeRef.current) * 100
       : 0;
+
+  return {
+    startTimer,
+    toggleTimer,
+    resetTimer,
+    restartTimer,
+    stateMachine,
+    percentage,
+  };
+}
+
+const Timer = () => {
+  const [inputTime, setInputTime] = useState({
+    hours: "",
+    minutes: "",
+    seconds: "",
+  });
+  const [showPopup, setShowPopup] = useState(false);
+
+  const audioRef = useRef(null);
+
+  const inputTimeInMilliseconds =
+    1000 *
+    (parseInt(inputTime.hours || "0") * 3600 +
+      parseInt(inputTime.minutes || "0") * 60 +
+      parseInt(inputTime.seconds || "0"));
+
+  const {
+    startTimer,
+    toggleTimer,
+    resetTimer,
+    restartTimer,
+    stateMachine,
+    percentage,
+  } = useTimer({
+    inputTimeInMilliseconds,
+    setShowPopup,
+    audioRef,
+    onRestart: () => {
+      setShowPopup(false);
+      audioRef.current.pause();
+    },
+    onFinished: () => {
+      setShowPopup(true);
+      audioRef.current.play();
+    },
+    onReset: () => {
+      setInputTime({ hours: "", minutes: "", seconds: "" });
+      setShowPopup(false);
+      audioRef.current.pause();
+    },
+  });
+
+  useEffect(() => {
+    audioRef.current = new Audio(notification);
+    audioRef.current.loop = true;
+  }, []);
+
+  function dismissPopup() {
+    setShowPopup(false);
+    audioRef.current.pause();
+  }
 
   function getColor(percentage) {
     if (percentage > 50) return "#4caf50";
