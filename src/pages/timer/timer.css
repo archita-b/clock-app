@@ -1,51 +1,50 @@
 .timer {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    height: 100vh;
-    padding: 2rem 1rem;
-    box-sizing: border-box;
-    background-color: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  background-color: white;
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+  width: 280px;
 }
 .timer-display {
-    color: #333b;
-    font-size: 3rem;
-    font-weight: bold;
-}
-.timer-control {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-bottom: 3rem;
-}
-.timer-control button {
-    flex: 1;
-    max-width: 10rem;
-    padding: 1rem;
-    border: none;
-    border-radius: 1rem;
-    font-size: 1.2rem;
-    font-weight: bold;
-    cursor: pointer;
-}
-.resume-timer {
-    background-color: #2196f3;
-}
-.reset-timer {
-    background-color: #dc3545;
-}
-.timer-control button:hover {
-    opacity: 0.9;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
 }
 .progress-bar {
-    display: flex;
-    flex-direction: column;
-    gap: 3rem;
-    margin-top: 10rem;
-    width: 200px;
-    height: 200px;
+  width: 180px;
+  height: 180px;
 }
-
-  
+.timer-control {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+}
+.timer-control button {
+  flex: 1;
+  padding: 0.8rem 1.2rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  color: white;
+}
+.resume-timer {
+  background-color: #2196f3;
+}
+.resume-timer:hover {
+  opacity: 0.9;
+}
+.delete-timer {
+  background-color: #f44336;
+}
+.delete-timer:hover {
+  opacity: 0.9;
+}

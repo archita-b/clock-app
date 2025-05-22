@@ -4,7 +4,7 @@ import "./addNewTimer.css";
 
 const AddNewTimer = () => {
   return (
-    <div className="add-timer">
+    <div className="add-timer-button">
       <button>
         <IoAdd />
       </button>

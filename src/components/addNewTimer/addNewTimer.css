@@ -1,15 +1,24 @@
-.add-timer {
-    display: flex;
-    justify-content: flex-end;
+.add-timer-button {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 6rem;
 }
-.add-timer button {
-    font-size: 1.7rem;
-    font-weight: bold;
-    border: none;
-    background-color: transparent;
-    color: #333;
-    padding: 0.5rem;
+.add-timer-button button {
+  border: none;
+  border-radius: 10px;
+  background-color: transparent;
+  width: 3.5rem;
+  height: 3.5rem;
+  color: #777;
+  font-size: 2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease-in-out;
 }
-.add-timer button:hover {
-    background-color: #eee;
+.add-timer-button button:hover {
+  transform: scale(1.1);
 }

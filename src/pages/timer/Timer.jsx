@@ -13,45 +13,27 @@ import { formatTime } from "../../utils/FormatTime";
 import { useTimer } from "../../utils/useTimer";
 import "./timer.css";
 
-const TimerPage = () => {
-  const [inputTime, setInputTime] = useState({
-    hours: "",
-    minutes: "",
-    seconds: "",
-  });
+const Timer = ({ id, inputTimeInMilliseconds, deleteTimer }) => {
   const [showPopup, setShowPopup] = useState(false);
 
   const audioRef = useRef(null);
 
-  const inputTimeInMilliseconds =
-    1000 *
-    (parseInt(inputTime.hours || "0") * 3600 +
-      parseInt(inputTime.minutes || "0") * 60 +
-      parseInt(inputTime.seconds || "0"));
-
-  const {
-    startTimer,
-    toggleTimer,
-    resetTimer,
-    restartTimer,
-    stateMachine,
-    percentage,
-  } = useTimer({
-    inputTimeInMilliseconds,
-    onRestart: () => {
-      setShowPopup(false);
-      audioRef.current.pause();
-    },
-    onFinished: () => {
-      setShowPopup(true);
-      audioRef.current.play();
-    },
-    onReset: () => {
-      setInputTime({ hours: "", minutes: "", seconds: "" });
-      setShowPopup(false);
-      audioRef.current.pause();
-    },
-  });
+  const { startTimer, toggleTimer, restartTimer, stateMachine, percentage } =
+    useTimer({
+      inputTimeInMilliseconds,
+      onRestart: () => {
+        setShowPopup(false);
+        audioRef.current.pause();
+      },
+      onFinished: () => {
+        setShowPopup(true);
+        audioRef.current.play();
+      },
+      onReset: () => {
+        setShowPopup(false);
+        audioRef.current.pause();
+      },
+    });
 
   useEffect(() => {
     audioRef.current = new Audio(notification);
@@ -76,29 +58,25 @@ const TimerPage = () => {
       )}
 
       <div className="timer">
-        {stateMachine.state === "IDLE" ? (
-          <TimerInput inputTime={inputTime} setInputTime={setInputTime} />
-        ) : (
-          <div className="progress-bar">
-            {stateMachine.state !== "FINISHED" ? (
-              <CircularProgressbar
-                value={percentage}
-                text={formatTime(stateMachine.timeLeft)}
-                styles={buildStyles({
-                  pathColor: getColor(percentage),
-                  textColor: "#333",
-                  trailColor: "#eee",
-                  strokeLinecap: "round",
-                  pathTransitionDuration: 0.5,
-                })}
-              />
-            ) : (
-              <div className="timer-display">
-                {formatTime(stateMachine.timeLeft, false)}
-              </div>
-            )}
-          </div>
-        )}
+        <div className="progress-bar">
+          {stateMachine.state !== "FINISHED" ? (
+            <CircularProgressbar
+              value={percentage}
+              text={formatTime(stateMachine.timeLeft)}
+              styles={buildStyles({
+                pathColor: getColor(percentage),
+                textColor: "#333",
+                trailColor: "#eee",
+                strokeLinecap: "round",
+                pathTransitionDuration: 0.5,
+              })}
+            />
+          ) : (
+            <div className="timer-display">
+              {formatTime(stateMachine.timeLeft, false)}
+            </div>
+          )}
+        </div>
 
         <div className="timer-control">
           {stateMachine.state === "IDLE" && (
@@ -118,7 +96,12 @@ const TimerPage = () => {
               {showPopup ? (
                 <TimerDismissButton dismissPopup={dismissPopup} />
               ) : (
-                <TimerResetButton resetTimer={resetTimer} />
+                <button
+                  className="delete-timer"
+                  onClick={() => deleteTimer(id)}
+                >
+                  Delete
+                </button>
               )}
             </>
           )}
@@ -128,4 +111,4 @@ const TimerPage = () => {
   );
 };
 
-export default TimerPage;
+export default Timer;
