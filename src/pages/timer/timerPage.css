@@ -11,9 +11,9 @@
 .input-section {
   display: flex;
   flex-direction: column;
+  justify-content: stretch;
   align-items: center;
-  gap: 25rem;
-  margin-top: 6rem; 
+  gap: 10rem;
   width: 100%;
   max-width: 400px;
 }
@@ -38,4 +38,33 @@
   justify-content: center;
   align-items: center;
 }
+.timer-navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+.timer-wrapper.hidden {
+  display: none;
+}
+.timer-wrapper.active {
+  display: block;
+}
+.nav-arrow {
+  background-color: transparent;
+  color: #333;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+  height: 3rem;
+  width: 3rem;
+}
+.nav-arrow:not(:disabled):hover {
+  transform: scale(1.2);
+}
+.nav-arrow:disabled {
+  color: #aaa;
+}
+
 

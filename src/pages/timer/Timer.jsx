@@ -62,7 +62,11 @@ const Timer = ({ id, inputTimeInMilliseconds, deleteTimer }) => {
           {stateMachine.state !== "FINISHED" ? (
             <CircularProgressbar
               value={percentage}
-              text={formatTime(stateMachine.timeLeft)}
+              text={
+                stateMachine.state === "IDLE"
+                  ? formatTime(inputTimeInMilliseconds)
+                  : formatTime(stateMachine.timeLeft)
+              }
               styles={buildStyles({
                 pathColor: getColor(percentage),
                 textColor: "#333",

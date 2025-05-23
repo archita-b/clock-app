@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { IoIosArrowBack } from "react-icons/io";
+import { IoIosArrowForward } from "react-icons/io";
 
 import TimerInput from "../../components/timerInput/TimerInput";
 import AddNewTimer from "../../components/addNewTimer/AddNewTimer";
@@ -14,6 +16,7 @@ const TimerPage = () => {
     seconds: "",
   });
   const [showInput, setShowInput] = useState(true);
+  const [timerIndex, setTimerIndex] = useState(0);
 
   const inputTimeInMilliseconds =
     1000 *
@@ -34,40 +37,82 @@ const TimerPage = () => {
     ]);
     setInputTime({ hours: "", minutes: "", seconds: "" });
     setShowInput(false);
+    setTimerIndex(timers.length);
   }
 
   function deleteTimer(id) {
-    setTimers((prevTimers) => prevTimers.filter((timer) => timer.id !== id));
+    setTimers((prevTimers) => {
+      const remainingTimers = prevTimers.filter((timer) => timer.id !== id);
+      const newTimerIndex = Math.min(timerIndex, remainingTimers.length - 1);
+      setTimerIndex(newTimerIndex >= 0 ? newTimerIndex : 0);
+      return remainingTimers;
+    });
+  }
+
+  function goToPrevious() {
+    setTimerIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : prevIndex));
+  }
+
+  function goToNext() {
+    setTimerIndex((prevIndex) =>
+      prevIndex < timers.length - 1 ? prevIndex + 1 : prevIndex
+    );
   }
 
   return (
     <div className="timer-page">
-      {showInput && (
+      {showInput ? (
         <div className="input-section">
           <TimerInput inputTime={inputTime} setInputTime={setInputTime} />
           <button className="add-timer" onClick={addTimer}>
             Add Timer
           </button>
         </div>
+      ) : (
+        <div onClick={() => setShowInput(true)}>
+          <AddNewTimer />
+        </div>
       )}
 
       {!showInput && (
-        <>
-          <div onClick={() => setShowInput(true)}>
-            <AddNewTimer />
-          </div>
+        <div className="timer-navigation">
+          {timers.length > 1 && (
+            <button
+              className="nav-arrow"
+              onClick={goToPrevious}
+              disabled={timerIndex === 0}
+            >
+              <IoIosArrowBack />
+            </button>
+          )}
 
           <div className="timers-list">
-            {timers.map((timer) => (
-              <Timer
+            {timers.map((timer, index) => (
+              <div
                 key={timer.id}
-                id={timer.id}
-                inputTimeInMilliseconds={timer.inputTimeInMilliseconds}
-                deleteTimer={deleteTimer}
-              />
+                className={`timer-wrapper ${
+                  index === timerIndex ? "active" : "hidden"
+                }`}
+              >
+                <Timer
+                  id={timer.id}
+                  inputTimeInMilliseconds={timer.inputTimeInMilliseconds}
+                  deleteTimer={deleteTimer}
+                />
+              </div>
             ))}
           </div>
-        </>
+
+          {timers.length > 1 && (
+            <button
+              className="nav-arrow"
+              onClick={goToNext}
+              disabled={timerIndex === timers.length - 1}
+            >
+              <IoIosArrowForward />
+            </button>
+          )}
+        </div>
       )}
     </div>
   );
