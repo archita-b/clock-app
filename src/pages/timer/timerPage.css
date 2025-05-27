@@ -11,7 +11,6 @@
 .input-section {
   display: flex;
   flex-direction: column;
-  justify-content: stretch;
   align-items: center;
   gap: 10rem;
   width: 100%;
@@ -30,41 +29,52 @@
 .add-timer:hover {
   background-color: #43a047;
 }
-.timers-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 3rem;
+.slider {
   width: 100%;
-  justify-content: center;
-  align-items: center;
+  overflow: hidden;
+  padding: 1rem;
+  box-sizing: border-box;
 }
-.timer-navigation {
+.slides {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  gap: 1rem;
 }
-.timer-wrapper.hidden {
-  display: none;
+.slide {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 360px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  box-sizing: border-box;
 }
-.timer-wrapper.active {
-  display: block;
+ .slides::-webkit-scrollbar {
+  height: 8px;
 }
-.nav-arrow {
-  background-color: transparent;
-  color: #333;
-  border: none;
-  font-size: 2rem;
-  cursor: pointer;
-  transition: transform 0.2s ease-in-out;
-  height: 3rem;
-  width: 3rem;
+.slides::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
 }
-.nav-arrow:not(:disabled):hover {
-  transform: scale(1.2);
+.slides::-webkit-scrollbar-track {
+  background: transparent;
 }
-.nav-arrow:disabled {
-  color: #aaa;
+@media (min-width: 768px) {
+  .slides {
+    overflow-x: visible;
+    scroll-snap-type: none;
+    flex-wrap: wrap;           
+    justify-content: center;
+    flex-grow: 1;
+  }
+  .slide {
+    width: 300px;
+    max-width: 300px;
+  }
 }
-
 

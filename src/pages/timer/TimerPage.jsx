@@ -49,16 +49,6 @@ const TimerPage = () => {
     });
   }
 
-  function goToPrevious() {
-    setTimerIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : prevIndex));
-  }
-
-  function goToNext() {
-    setTimerIndex((prevIndex) =>
-      prevIndex < timers.length - 1 ? prevIndex + 1 : prevIndex
-    );
-  }
-
   return (
     <div className="timer-page">
       {showInput ? (
@@ -75,25 +65,10 @@ const TimerPage = () => {
       )}
 
       {!showInput && (
-        <div className="timer-navigation">
-          {timers.length > 1 && (
-            <button
-              className="nav-arrow"
-              onClick={goToPrevious}
-              disabled={timerIndex === 0}
-            >
-              <IoIosArrowBack />
-            </button>
-          )}
-
-          <div className="timers-list">
-            {timers.map((timer, index) => (
-              <div
-                key={timer.id}
-                className={`timer-wrapper ${
-                  index === timerIndex ? "active" : "hidden"
-                }`}
-              >
+        <div className="slider">
+          <div className="slides">
+            {timers.map((timer) => (
+              <div key={timer.id} className="slide">
                 <Timer
                   id={timer.id}
                   inputTimeInMilliseconds={timer.inputTimeInMilliseconds}
@@ -102,16 +77,6 @@ const TimerPage = () => {
               </div>
             ))}
           </div>
-
-          {timers.length > 1 && (
-            <button
-              className="nav-arrow"
-              onClick={goToNext}
-              disabled={timerIndex === timers.length - 1}
-            >
-              <IoIosArrowForward />
-            </button>
-          )}
         </div>
       )}
     </div>
