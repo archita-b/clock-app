@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { IoIosArrowBack } from "react-icons/io";
-import { IoIosArrowForward } from "react-icons/io";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
 import TimerInput from "../../components/timerInput/TimerInput";
 import AddNewTimer from "../../components/addNewTimer/AddNewTimer";
 import Timer from "../../components/timer/Timer";
+import Modal from "../../components/modal/Modal";
+
 import "./timerPage.css";
 
 const TimerPage = () => {
@@ -35,6 +36,7 @@ const TimerPage = () => {
       ...prevTimers,
       { id, inputTimeInMilliseconds: totalMs },
     ]);
+
     setInputTime({ hours: "", minutes: "", seconds: "" });
     setShowInput(false);
     setTimerIndex(timers.length);
@@ -51,20 +53,33 @@ const TimerPage = () => {
 
   return (
     <div className="timer-page">
-      {showInput ? (
+      {timers.length === 0 && showInput && (
         <div className="input-section">
           <TimerInput inputTime={inputTime} setInputTime={setInputTime} />
           <button className="add-timer" onClick={addTimer}>
             Add Timer
           </button>
         </div>
-      ) : (
+      )}
+
+      {timers.length >= 0 && !showInput && (
         <div onClick={() => setShowInput(true)}>
           <AddNewTimer />
         </div>
       )}
 
-      {!showInput && (
+      {timers.length > 0 && showInput && (
+        <Modal onClose={() => setShowInput(false)}>
+          <div className="input-section">
+            <TimerInput inputTime={inputTime} setInputTime={setInputTime} />
+            <button className="add-timer" onClick={addTimer}>
+              Add Timer
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {timers.length > 0 && (
         <div className="slider">
           <div className="slides">
             {timers.map((timer) => (
