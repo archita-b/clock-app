@@ -5,7 +5,7 @@ import { IoIosArrowForward } from "react-icons/io";
 
 import TimerInput from "../../components/timerInput/TimerInput";
 import AddNewTimer from "../../components/addNewTimer/AddNewTimer";
-import Timer from "./Timer";
+import Timer from "../../components/timer/Timer";
 import "./timerPage.css";
 
 const TimerPage = () => {

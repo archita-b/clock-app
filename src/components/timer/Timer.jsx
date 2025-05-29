@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
 
-import TimerInput from "../../components/timerInput/TimerInput";
-import TimerStartButton from "../../components/timerStartButton/TimerStartButton";
-import TimerResetButton from "../../components/timerResetButton/TimerResetButton";
-import TimerDismissButton from "../../components/timerDismissButton/TimerDismissButton";
-import TimerRestartButton from "../../components/timerRestartButton/TimerRestartButton";
-import Popup from "../../components/popup/Popup";
+import TimerInput from "../timerInput/TimerInput";
+import TimerStartButton from "../timerStartButton/TimerStartButton";
+import TimerResetButton from "../timerResetButton/TimerResetButton";
+import TimerDismissButton from "../timerDismissButton/TimerDismissButton";
+import TimerRestartButton from "../timerRestartButton/TimerRestartButton";
+import Popup from "../popup/Popup";
 import notification from "../../assets/notification.mp3";
 import { formatTime } from "../../utils/FormatTime";
 import { useTimer } from "../../utils/useTimer";
