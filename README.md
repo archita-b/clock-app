@@ -1,12 +1,35 @@
-# React + Vite
+# Timer & Stopwatch App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A clean and responsive React app with two core components:
 
-Currently, two official plugins are available:
+- **Stopwatch**: Track elapsed time with start, pause, and reset options.
+- **Timer**: Set countdown timers with customizable durations.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Stopwatch
+
+- Start, pause, and reset functionality
+- Real-time display of elapsed time
+
+### Timer
+
+- Add multiple timers
+- Pause, resume, reset, or delete timers
+- Modal input for additional timers
+- Visual countdown using circular progress bar
+- Notification sound and desktop alert when time's up
+- Responsive and mobile-friendly layout
+
+---
+
+## Installation
+
+```
+git clone https://github.com/archita-b/clock-app.git
+cd clock-app
+npm install
+npm run dev
+```
