@@ -18,6 +18,12 @@ const Timer = ({ id, inputTimeInMilliseconds, deleteTimer }) => {
 
   const audioRef = useRef(null);
 
+  function notifyMe() {
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification("Time's up!");
+    }
+  }
+
   const { startTimer, toggleTimer, restartTimer, stateMachine, percentage } =
     useTimer({
       inputTimeInMilliseconds,
@@ -28,6 +34,7 @@ const Timer = ({ id, inputTimeInMilliseconds, deleteTimer }) => {
       onFinished: () => {
         setShowPopup(true);
         audioRef.current.play();
+        notifyMe();
       },
       onReset: () => {
         setShowPopup(false);
