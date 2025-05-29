@@ -30,15 +30,19 @@ const Timer = ({ id, inputTimeInMilliseconds, deleteTimer }) => {
       onRestart: () => {
         setShowPopup(false);
         audioRef.current.pause();
+        audioRef.current.currentTime = 0;
       },
       onFinished: () => {
         setShowPopup(true);
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
         audioRef.current.play();
         notifyMe();
       },
       onReset: () => {
         setShowPopup(false);
         audioRef.current.pause();
+        audioRef.current.currentTime = 0;
       },
     });
 
@@ -50,6 +54,7 @@ const Timer = ({ id, inputTimeInMilliseconds, deleteTimer }) => {
   function dismissPopup() {
     setShowPopup(false);
     audioRef.current.pause();
+    audioRef.current.currentTime = 0;
   }
 
   function getColor(percentage) {
